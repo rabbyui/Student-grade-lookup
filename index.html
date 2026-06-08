@@ -13,7 +13,7 @@
     }
 
     .container {
-      max-width: 480px;
+      max-width: 650px;
       margin: 80px auto;
       background: #ffffff;
       padding: 30px;
@@ -68,25 +68,47 @@
     .success {
       color: #006400;
     }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      font-size: 15px;
+      color: #222;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    td {
+      font-weight: normal;
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h2>Student Grade Lookup</h2>
-    <p>Enter your Student ID and PIN to view your grade.</p>
+    <p>Enter your Student ID and PIN to view your grades.</p>
 
     <form id="gradeForm">
       <input type="text" id="studentId" placeholder="Student ID" required>
       <input type="password" id="pin" placeholder="PIN" required>
-      <button type="submit">Search Grade</button>
+      <button type="submit">Search Grades</button>
     </form>
 
     <div id="result"></div>
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyhZlGiC-ckOXeZeEOPIcIna0IEGMLy3yJyCDksHpyW/dev";
+    const API_URL = "https://script.google.com/macros/s/AKfycbw9Dez9qii4VmxUlsy1ktDUtcsxOENje17BPMVcxWQcJb8H7pJKy5Zf7cTkzNS-KsZL6Q/exec";
 
     document.getElementById("gradeForm").addEventListener("submit", async function(event) {
       event.preventDefault();
@@ -104,11 +126,37 @@
 
         if (data.found) {
           resultDiv.className = "success";
-          resultDiv.innerHTML = `
-            Subject: ${data.subject}<br>
-            Grade: ${data.grade}<br>
-            Remarks: ${data.remarks}
+
+          let output = `
+            <p>Student ID: ${data.studentId}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Grade</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
           `;
+
+          data.records.forEach(record => {
+            output += `
+              <tr>
+                <td>${record.subject}</td>
+                <td>${record.grade}</td>
+                <td>${record.remarks}</td>
+              </tr>
+            `;
+          });
+
+          output += `
+              </tbody>
+            </table>
+          `;
+
+          resultDiv.innerHTML = output;
+
         } else {
           resultDiv.className = "error";
           resultDiv.textContent = data.message;
