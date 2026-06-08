@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Grade Lookup</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 80px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #555;
+    }
+
+    input {
+      width: 90%;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      width: 95%;
+      padding: 12px;
+      margin-top: 18px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #222;
+      color: white;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    #result {
+      margin-top: 25px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .error {
+      color: #b00020;
+    }
+
+    .success {
+      color: #006400;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Student Grade Lookup</h2>
+    <p>Enter your Student ID and PIN to view your grade.</p>
+
+    <form id="gradeForm">
+      <input type="text" id="studentId" placeholder="Student ID" required>
+      <input type="password" id="pin" placeholder="PIN" required>
+      <button type="submit">Search Grade</button>
+    </form>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwI-7ZdKXjTS676xqKwEwNYxsaroENW2IWFsMsd0HLSK9jiWEgwoJzfMGglsWuscuTOHA/exec";
+
+    document.getElementById("gradeForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const studentId = document.getElementById("studentId").value.trim();
+      const pin = document.getElementById("pin").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      resultDiv.className = "";
+      resultDiv.textContent = "Searching...";
+
+      try {
+        const response = await fetch(`${API_URL}?studentId=${encodeURIComponent(studentId)}&pin=${encodeURIComponent(pin)}`);
+        const data = await response.json();
+
+        if (data.found) {
+          resultDiv.className = "success";
+          resultDiv.innerHTML = `
+            Grade: ${data.grade}<br>
+            Remarks: ${data.remarks}
+          `;
+        } else {
+          resultDiv.className = "error";
+          resultDiv.textContent = data.message;
+        }
+
+      } catch (error) {
+        resultDiv.className = "error";
+        resultDiv.textContent = "Error connecting to the grade database.";
+      }
+    });
+  </script>
+
+</body>
+</html>
